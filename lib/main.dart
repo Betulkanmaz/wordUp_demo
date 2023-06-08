@@ -47,7 +47,7 @@ class SplashScreenState extends State<MyHomePage> {
         child: Center(
           child: Text(
             'wordUp',
-            style: UIStyle.h2.copyWith(color: UIColors.white),
+            style: UIStyle.h2,
           ),
         ),
       ),
