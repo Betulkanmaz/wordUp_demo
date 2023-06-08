@@ -10,8 +10,15 @@ class KnownWords extends StatefulWidget {
 class _KnownWordsState extends State<KnownWords> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-
+    return Scaffold(
+        body: Container(
+          child: ListView(
+            children: [
+              Text('1'),
+              Text('2'),
+            ],
+          ),
+        ),
     );
   }
 }

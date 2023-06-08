@@ -38,7 +38,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_fonts: ^5.0.0
   http: ^1.0.0
-  swipeable_card_stack: ^0.0.5
+  flutter_card_swiper: ^5.1.0
+  flutter_svg: ^2.0.6
 
 dev_dependencies:
   flutter_test:
