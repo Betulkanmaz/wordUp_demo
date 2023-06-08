@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wordup_demo/screens/known_words.dart';
 import 'package:wordup_demo/screens/words_to_learn.dart';
 import 'package:wordup_demo/theme/colors.dart';
@@ -26,6 +28,26 @@ class _HomePageState extends State<HomePage> {
     WordsToLearn(),
     KnownWords(),
   ];
+
+  List<Container> cards = [
+    Container(
+      alignment: Alignment.center,
+      child: const Text('1'),
+      color: Colors.blue,
+    ),
+    Container(
+      alignment: Alignment.center,
+      child: const Text('2'),
+      color: Colors.red,
+    ),
+    Container(
+      alignment: Alignment.center,
+      child: const Text('3'),
+      color: Colors.purple,
+    )
+  ];
+
+  CardSwiperController _cardSwiperController = CardSwiperController();
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +88,15 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   width: MediaQuery.of(context).size.width * 0.872,
                   height: MediaQuery.of(context).size.height * 0.472,
-
+                  child: CardSwiper(
+                    isLoop: false,
+                    onEnd: () {
+                      //10 kart ekle
+                    },
+                    controller: _cardSwiperController,
+                    cardsCount: cards.length,
+                    cardBuilder: (context, index) => cards[index],
+                  ),
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.693,
@@ -78,6 +108,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
+                          _cardSwiperController.swipeLeft();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: UIColors.grey50,
@@ -105,14 +136,16 @@ class _HomePageState extends State<HomePage> {
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.064,
                           height: MediaQuery.of(context).size.height * 0.029,
-                          child: Icon(
-                            Icons.rotate_left_sharp,
-                            color: UIColors.primary300,
+                          child: SvgPicture.asset(
+                            'assets/images/right.svg',
+                            width: 24,
+                            height: 24,
                           ),
                         ),
                       ),
                       ElevatedButton(
                           onPressed: () {
+                            _cardSwiperController.swipeRight();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: UIColors.grey50,
@@ -123,9 +156,10 @@ class _HomePageState extends State<HomePage> {
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width * 0.064,
                             height: MediaQuery.of(context).size.height * 0.029,
-                            child: Icon(
-                              Icons.check,
-                              color: UIColors.primary300,
+                            child: SvgPicture.asset(
+                              'assets/images/right.svg',
+                              width: 24,
+                              height: 24,
                             ),
                           )),
                     ],
@@ -138,15 +172,14 @@ class _HomePageState extends State<HomePage> {
         bottomNavigationBar: Container(
           padding: EdgeInsets.zero,
           child: BottomNavigationBar(
-            type: BottomNavigationBarType.shifting,
+            type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(
                   label: '',
                   icon: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.048,
                       height: MediaQuery.of(context).size.height * 0.022,
-                      child: Icon(Icons.star_border,
-                          color: UIColors.grey200))),
+                      child: Icon(Icons.star_border, color: UIColors.grey200))),
               BottomNavigationBarItem(
                   label: '',
                   icon: SizedBox(
@@ -188,4 +221,3 @@ class _HomePageState extends State<HomePage> {
     }
   } */
 }
-
