@@ -40,6 +40,9 @@ dependencies:
   http: ^1.0.0
   flutter_card_swiper: ^5.1.0
   flutter_svg: ^2.0.6
+  flip_card: ^0.7.0
+  get: ^4.6.5
+  hive: ^2.2.3
 
 dev_dependencies:
   flutter_test:

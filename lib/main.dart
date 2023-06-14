@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:wordup_demo/screens/home_page.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:hive/hive.dart';
+import 'package:wordup_demo/helper/bottom_navigaton_bar.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
 
-void main() {
+Future<void> main() async {
   runApp(const MyApp());
+
 }
 
 class MyApp extends StatelessWidget {
@@ -14,7 +17,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'WordUp Demo',
       home: MyHomePage(),
@@ -30,13 +33,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class SplashScreenState extends State<MyHomePage> {
+
   @override
   void initState() {
     super.initState();
     Timer(
         const Duration(seconds: 2),
         () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const HomePage())));
+            MaterialPageRoute(builder: (context) => const BottomNavBar())));
   }
 
   @override
