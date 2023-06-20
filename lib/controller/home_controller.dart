@@ -2,19 +2,47 @@ import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class HomeController extends GetxController{
 
   @override
-  void onInit(){
+  Future<void> onInit() async {
+    super.onInit();
     init();
   }
 
+  var word_box = Hive.box('word_box');
+  var learn_box = Hive.box('learn_words');
+  var known_box = Hive.box('known_words');
+
   init() async{
-    await fetchAPIdata();
+    if(word_box.isEmpty) {
+      await fetchAPIdata();
+    } else {
+      data.addAll(word_box.values.map((e) => e.toString()));//uygulama tekrar acildiginda
+    }
+    data.shuffle();
+    list.addAll(data.take(takeCount));
+    isBusy.value = false;
   }
+
+  setWordsToLearn(){
+    wordsToLearn.clear();
+    wordsToLearn.addAll(learn_box.values.map((e) => e.toString()));
+  }
+
+  setKnownWords(){
+    knownWords.clear();
+    knownWords.addAll(known_box.values.map((e) => e.toString()));
+  }
+
+  RxList<String> wordsToLearn = <String>[].obs;
+  RxList<String> knownWords = <String>[].obs;
+
+
 
   Future<dynamic> fetchAPIdata() async {
     //API cagrisi
@@ -29,7 +57,7 @@ class HomeController extends GetxController{
               ?.map((e) => e?.toString() ?? "")
               .toList() ??
               []);
-          list.addAll(data.take(takeCount));
+          word_box.addAll(data);
           isBusy.value = false;
         }
       } else {
@@ -39,14 +67,11 @@ class HomeController extends GetxController{
     catch(_){
       isBusy.value = false;
     }
-
   }
-
   RxList<String> list = <String>[].obs;
   RxList<String> data = <String>[].obs;
 
   CardSwiperController cardSwiperController = CardSwiperController();
-
   FlipCardController flipCardController = FlipCardController();
 
   var isBusy = true.obs;
@@ -62,10 +87,19 @@ class HomeController extends GetxController{
     isBusy.value = false;
   }
 
-  void addWord() async{
-    var box2 = Hive.openBox('learn_words');
+  
+  addLearnWord(String word){
+    if(!learn_box.values.contains(word)) {
+      learn_box.add(word);//kutuya ekleme
 
-
+    }
   }
 
+  addknownWord(String word){
+    if(!known_box.values.contains(word)) {
+      known_box.add(word); //kutuya ekleme
+    }
+  }
 }
+
+//atilan kelimeyi ana boxtan silme

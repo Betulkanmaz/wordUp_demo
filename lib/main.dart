@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wordup_demo/helper/bottom_navigaton_bar.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
 
 Future<void> main() async {
   runApp(const MyApp());
+  await Hive.initFlutter();
+  //Hive.registerAdapter();
+  await Hive.openBox('learn_words');
+  await Hive.openBox('known_words');
+  await Hive.openBox('word_box');
 
 }
 
@@ -17,7 +22,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'WordUp Demo',
       home: MyHomePage(),

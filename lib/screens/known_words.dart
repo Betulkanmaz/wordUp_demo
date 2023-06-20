@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
+import '../controller/home_controller.dart';
 
 class KnownWords extends StatefulWidget {
   const KnownWords({Key? key}) : super(key: key);
@@ -10,50 +13,21 @@ class KnownWords extends StatefulWidget {
 }
 
 class _KnownWordsState extends State<KnownWords> {
-  final List<String> words = [
-    "abreact",
-    "abreacted",
-    "abreacting",
-    "abreaction",
-    "abreactions",
-    "abreacts",
-    "abreast",
-    "abri",
-    "abridge",
-    "abridged",
-    "abridgement",
-    "abridgements",
-    "abridger",
-    "abridgers",
-    "abridges",
-    "abridging",
-    "abridgment",
-    "abridgments",
-    "abris",
-    "abroach",
-    "abroad",
-    "abrogable",
-    "abrogate",
-    "abrogated",
-    "abrogates",
-    "abrogating",
-    "abrogation",
-    "abrogations",
-    "abrogator",
-    "abrogators",
-    "abrosia",
-    "abrosias",
-    "abrupt",
-    "abrupter",
-    "abruptest",
-    "abruption",
-    "abruptions",
-    "abruptly",
-    "abruptness",
-    "abruptnesses"
-  ];
 
+  var controller = Get.put(HomeController());
   ScrollController scrollController = ScrollController();
+
+  void initState() {
+    super.initState();
+    controller.setKnownWords();
+    WidgetsBinding.instance.addObserver(
+        LifecycleEventHandler(resumeCallBack: () async{
+          controller.setKnownWords();
+        },suspendingCallBack: () async {
+          controller.setKnownWords();
+        })
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +60,7 @@ class _KnownWordsState extends State<KnownWords> {
                     separatorBuilder: (context, index) => SizedBox(height: 8.0),
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: words.length,
+                    itemCount: controller.knownWords.length,
                     physics: ScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
@@ -100,7 +74,7 @@ class _KnownWordsState extends State<KnownWords> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(words[index], style: UIStyle.b1.copyWith(color: UIColors.grey400,)),
+                            Text(controller.knownWords[index], style: UIStyle.b1.copyWith(color: UIColors.grey400,)),
                           ],
                         ),
                       );
@@ -113,5 +87,33 @@ class _KnownWordsState extends State<KnownWords> {
         ),
       ),
     );
+  }
+}
+
+class LifecycleEventHandler extends WidgetsBindingObserver { //tiklanildiginda sayfa yenilenmesi icin
+  final AsyncCallback resumeCallBack;
+  final AsyncCallback suspendingCallBack;
+
+  LifecycleEventHandler({
+    required this.resumeCallBack,
+    required this.suspendingCallBack,
+  });
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (resumeCallBack != null) {
+          await resumeCallBack();
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        if (suspendingCallBack != null) {
+          await suspendingCallBack();
+        }
+        break;
+    }
   }
 }

@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:wordup_demo/screens/words_to_learn.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
-import 'dart:ui';
 import '../controller/home_controller.dart';
 
-//3 hive box
+///ana hive kutusundan alinan verileri hivedan silinmeli
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -23,26 +21,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<String> data = [];
 
-  var box1 = Hive.openBox('words');
-  var box3 = Hive.openBox('known_words');
-
   @override
   Future<void> initState() async {
-    // TODO: implement initState
     super.initState();
     //fetchAPIdata();
-    box1.then((value) {
-      setState(() {
-        box1 = value as Future<Box>;
-      });
-    });
-
+    Hive.initFlutter();
   }
 
-
-  CardSwiperController _cardSwiperController = CardSwiperController();
+  final CardSwiperController _cardSwiperController = CardSwiperController();
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
-
   FlipCardController flipCardController = FlipCardController();
 
   var isBusy = true;
@@ -55,7 +42,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         body: Center(
           child: isBusy
-              ? CircularProgressIndicator()
+              ? const CircularProgressIndicator()
               : Container(
                   height: MediaQuery.of(context).size.height * 0.732,
                   width: MediaQuery.of(context).size.width * 0.872,
@@ -165,7 +152,6 @@ class _HomePageState extends State<HomePage> {
                               //sola kaydirma
                               onPressed: () {
                                 _cardSwiperController.swipeLeft();
-
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: UIColors.grey50,
@@ -252,10 +238,14 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomePageStless extends StatelessWidget {
+class HomePageStless extends StatefulWidget {
   HomePageStless({Key? key}) : super(key: key);
 
-  WordsToLearn wordsToLearnInstance = WordsToLearn();
+  @override
+  State<HomePageStless> createState() => _HomePageStlessState();
+}
+
+class _HomePageStlessState extends State<HomePageStless> {
   var controller = Get.put(HomeController());
   int index = 0;
 
@@ -309,6 +299,10 @@ class HomePageStless extends StatelessWidget {
                             isLoop: true,
                             onEnd: () {
                               controller.listNext();
+                            },
+                            onSwipe: (previousIndex, currentIndex, direction) {
+                              index = currentIndex ?? previousIndex;
+                              return Future.value(true);
                             },
                             controller: controller.cardSwiperController,
                             cardsCount: controller.list.length,
@@ -370,6 +364,8 @@ class HomePageStless extends StatelessWidget {
                                 //sola kaydirma
                                 onPressed: () {
                                   controller.cardSwiperController.swipeLeft();
+                                    controller
+                                        .addLearnWord(controller.list[index]);
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: UIColors.grey50,
@@ -424,6 +420,8 @@ class HomePageStless extends StatelessWidget {
                                 //saga kaydirma
                                 onPressed: () {
                                   controller.cardSwiperController.swipeRight();
+                                  controller
+                                      .addknownWord(controller.list[index]);
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: UIColors.grey50,
@@ -459,3 +457,4 @@ class HomePageStless extends StatelessWidget {
     );
   }
 }
+//main_box tanimlamasini yap
