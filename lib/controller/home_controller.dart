@@ -24,7 +24,7 @@ class HomeController extends GetxController{
     } else {
       data.addAll(word_box.values.map((e) => e.toString()));//uygulama tekrar acildiginda
     }
-    data.shuffle();
+    //data.shuffle();
     list.addAll(data.take(takeCount));
     isBusy.value = false;
   }
@@ -41,8 +41,6 @@ class HomeController extends GetxController{
 
   RxList<String> wordsToLearn = <String>[].obs;
   RxList<String> knownWords = <String>[].obs;
-
-
 
   Future<dynamic> fetchAPIdata() async {
     //API cagrisi
@@ -87,19 +85,25 @@ class HomeController extends GetxController{
     isBusy.value = false;
   }
 
-  
+  deleteWord(String word){
+    var index = word_box.values.toList().indexWhere((element) => element.toString() == word);
+    word_box.deleteAt(index);
+  }
+
   addLearnWord(String word){
     if(!learn_box.values.contains(word)) {
+      deleteWord(word);
       learn_box.add(word);//kutuya ekleme
-
     }
   }
 
   addknownWord(String word){
     if(!known_box.values.contains(word)) {
+      deleteWord(word);
       known_box.add(word); //kutuya ekleme
     }
   }
+
+  //initiliza et sayfayi arttir, listeyi sifirla
 }
 
-//atilan kelimeyi ana boxtan silme
