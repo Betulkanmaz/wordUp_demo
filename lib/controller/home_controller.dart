@@ -22,16 +22,18 @@ class HomeController extends GetxController {
       await fetchAPIdata();
     }
     if(word_box.isNotEmpty) {
-      ///uygulama tekrar acildiginda kelime eksilmesini sagla!!!!!!!!!!!!!!!!!
       data.addAll(word_box.values
           .map((e) => e.toString())); //uygulama tekrar acildiginda
-      /*data.removeWhere(
-          (word) => learn_box.values.contains(word) || known_box.values.contains(word));*/
+      data.removeWhere(
+          (word) => learn_box.values.contains(word) || known_box.values.contains(word));
+
     }
     //data.shuffle();
     list.addAll(data.take(takeCount));
     isBusy.value = false;
   }
+  RxList<String> wordsToLearn = <String>[].obs;
+  RxList<String> knownWords = <String>[].obs;
 
   setWordsToLearn() {
     wordsToLearn.clear();
@@ -42,9 +44,6 @@ class HomeController extends GetxController {
     knownWords.clear();
     knownWords.addAll(known_box.values.map((e) => e.toString()));
   }
-
-  RxList<String> wordsToLearn = <String>[].obs;
-  RxList<String> knownWords = <String>[].obs;
 
   Future<dynamic> fetchAPIdata() async {
     //API cagrisi
@@ -71,11 +70,12 @@ class HomeController extends GetxController {
   final RxBool learn = false.obs;
   RxList<String> list = <String>[].obs;
   RxList<String> data = <String>[].obs;
+  RxInt count = 0.obs;
 
   CardSwiperController cardSwiperController = CardSwiperController();
   FlipCardController flipCardController = FlipCardController();
 
-  var isBusy = true.obs;
+  RxBool isBusy = true.obs;
 
   var takeCount = 10;
   var page = 1;
@@ -89,26 +89,15 @@ class HomeController extends GetxController {
         .take(takeCount)); //gelen 10dan sonra liste devamini yukleme
     isBusy.value = false;
   }
-
-  deleteWord(String word) {
-    var index = word_box.values
-        .toList()
-        .indexWhere((element) => element.toString() == word);
-    word_box.deleteAt(index);
-  }
-
   addLearnWord(String word) {
-    list.remove(word);
-    if(!learn_box.containsKey(word)) {
+    if(!learn_box.values.contains(word)){
       learn_box.add(word);
-    }//kutuya ekleme
-  }
-
-  addknownWord(String word) {
-    if (!known_box.containsKey(word)) {
-      known_box.add(word);
     }
   }
 
-//initiliza et sayfayi arttir, listeyi sifirla
+  addknownWord(String word) {
+    if(!known_box.values.contains(word)){
+      known_box.add(word);
+    }
+  }
 }
