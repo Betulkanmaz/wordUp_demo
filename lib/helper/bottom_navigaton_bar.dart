@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:wordup_demo/screens/home_page.dart';
 import 'package:wordup_demo/screens/known_words.dart';
 import 'package:wordup_demo/screens/words_to_learn.dart';
@@ -13,10 +14,9 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
+  final RxInt currentIndex = 1.obs;
 
-  int currentIndex = 1;
-
-  List<Widget> pageList = [
+  final List<Widget> pageList = [
     WordsToLearn(),
     HomePageStless(),
     KnownWords(),
@@ -30,12 +30,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
         unselectedItemColor: UIColors.grey200,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        currentIndex: currentIndex,
+        currentIndex: currentIndex.value,
         type: BottomNavigationBarType.fixed,
-        onTap: (x){
-          setState(() {
-            currentIndex= x;
-          });
+        onTap: (x) {
+          currentIndex.value = x;
         },
         items: [
           BottomNavigationBarItem(
@@ -67,10 +65,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ),
         ],
       ),
-      body: IndexedStack(
+      body: Obx(() => IndexedStack(
         children: pageList,
-        index: currentIndex,
-      ),
+        index: currentIndex.value,
+      )),
     );
   }
 }

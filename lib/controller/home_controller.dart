@@ -6,8 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class HomeController extends GetxController{
-
+class HomeController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
@@ -18,23 +17,28 @@ class HomeController extends GetxController{
   var learn_box = Hive.box('learn_words');
   var known_box = Hive.box('known_words');
 
-  init() async{
-    if(word_box.isEmpty) {
+  init() async {
+    if (word_box.isEmpty) {
       await fetchAPIdata();
-    } else {
-      data.addAll(word_box.values.map((e) => e.toString()));//uygulama tekrar acildiginda
+    }
+    if(word_box.isNotEmpty) {
+      ///uygulama tekrar acildiginda kelime eksilmesini sagla!!!!!!!!!!!!!!!!!
+      data.addAll(word_box.values
+          .map((e) => e.toString())); //uygulama tekrar acildiginda
+      /*data.removeWhere(
+          (word) => learn_box.values.contains(word) || known_box.values.contains(word));*/
     }
     //data.shuffle();
     list.addAll(data.take(takeCount));
     isBusy.value = false;
   }
 
-  setWordsToLearn(){
+  setWordsToLearn() {
     wordsToLearn.clear();
     wordsToLearn.addAll(learn_box.values.map((e) => e.toString()));
   }
 
-  setKnownWords(){
+  setKnownWords() {
     knownWords.clear();
     knownWords.addAll(known_box.values.map((e) => e.toString()));
   }
@@ -44,28 +48,27 @@ class HomeController extends GetxController{
 
   Future<dynamic> fetchAPIdata() async {
     //API cagrisi
-    try{
+    try {
       final url = Uri.parse('https://random-word-api.herokuapp.com/all');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         if (responseData is List<dynamic>?) {
-          data.addAll(responseData
-              ?.map((e) => e?.toString() ?? "")
-              .toList() ??
-              []);
+          data.addAll(
+              responseData?.map((e) => e?.toString() ?? "").toList() ?? []);
           word_box.addAll(data);
           isBusy.value = false;
         }
       } else {
         return null;
       }
-    }
-    catch(_){
+    } catch (_) {
       isBusy.value = false;
     }
   }
+
+  final RxBool learn = false.obs;
   RxList<String> list = <String>[].obs;
   RxList<String> data = <String>[].obs;
 
@@ -81,29 +84,31 @@ class HomeController extends GetxController{
     isBusy.value = true;
     list.clear();
     page++;
-    list.addAll(data.skip(takeCount * page).take(takeCount)); //gelen 10dan sonra liste devamini yukleme
+    list.addAll(data
+        .skip(takeCount * page)
+        .take(takeCount)); //gelen 10dan sonra liste devamini yukleme
     isBusy.value = false;
   }
 
-  deleteWord(String word){
-    var index = word_box.values.toList().indexWhere((element) => element.toString() == word);
+  deleteWord(String word) {
+    var index = word_box.values
+        .toList()
+        .indexWhere((element) => element.toString() == word);
     word_box.deleteAt(index);
   }
 
-  addLearnWord(String word){
-    if(!learn_box.values.contains(word)) {
-      deleteWord(word);
-      learn_box.add(word);//kutuya ekleme
+  addLearnWord(String word) {
+    list.remove(word);
+    if(!learn_box.containsKey(word)) {
+      learn_box.add(word);
+    }//kutuya ekleme
+  }
+
+  addknownWord(String word) {
+    if (!known_box.containsKey(word)) {
+      known_box.add(word);
     }
   }
 
-  addknownWord(String word){
-    if(!known_box.values.contains(word)) {
-      deleteWord(word);
-      known_box.add(word); //kutuya ekleme
-    }
-  }
-
-  //initiliza et sayfayi arttir, listeyi sifirla
+//initiliza et sayfayi arttir, listeyi sifirla
 }
-

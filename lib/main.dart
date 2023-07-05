@@ -1,51 +1,49 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wordup_demo/helper/bottom_navigaton_bar.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
 
-Future<void> main() async {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  //Hive.registerAdapter();
   await Hive.openBox('learn_words');
   await Hive.openBox('known_words');
   await Hive.openBox('word_box');
 
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'WordUp Demo',
-      home: MyHomePage(),
+      home: const SplashScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  SplashScreenState createState() => SplashScreenState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class SplashScreenState extends State<MyHomePage> {
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
     Timer(
-        const Duration(seconds: 2),
-        () => Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const BottomNavBar())));
+      const Duration(seconds: 2),
+          () => Get.off(() => const BottomNavBar()),
+    );
   }
 
   @override

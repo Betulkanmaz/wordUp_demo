@@ -68,10 +68,18 @@ class _WordsToLearnState extends State<WordsToLearn> {
                       IconButton(
                         iconSize: 48.0,
                         onPressed: () {
-                          /*controller.list.clear();
+                          controller.learn.value = true;
+                          controller.wordsToLearn.clear();
+                          controller.wordsToLearn.addAll(controller.learn_box.values.map((e) => e.toString()));
+                          Get.to(() => HomePageStless());
+                          /*
                           controller.list.addAll(controller.learn_box.values.map((e) => e.toString()));
                           Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (context) => HomePageStless()));*/
+                              MaterialPageRoute(builder: (context) => HomePageStless())).then((value) {
+                                setState(() {
+                                  controller.list.addAll(controller.learn_box.values.map((e) => e.toString()));
+                                });
+                          }); */
                         },
                         icon: SvgPicture.asset('assets/images/start.svg',
                             fit: BoxFit.contain),
@@ -110,7 +118,7 @@ class _WordsToLearnState extends State<WordsToLearn> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(controller.wordsToLearn[index],
+                                  Text('fsdfs',
                                       style: UIStyle.b1.copyWith(
                                         color: UIColors.grey400,
                                       ),
