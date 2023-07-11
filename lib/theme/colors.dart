@@ -8,7 +8,7 @@ class UIColors{
   static Color primary100 = Color(0xFFDBEAFE);
   static Color primary200 = Color(0xFFBFDBFE);
   static Color grey50 = Color(0xFFF7F8F9);
-  static Color grey100 = Color(0xFFE2E47);
+  static Color grey100 = Color(0xFFF5F5F5);
   static Color grey200 = Color(0xFFACAFB8);
   static Color primary400 = Color(0xFF60A5FA);
   static Color primary500 = Color(0xFF3B82F6);
