@@ -1,11 +1,10 @@
 import 'dart:async';
-
 import 'package:flip_card/flip_card.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:wordup_demo/helper/bottom_navigaton_bar.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
 import '../controller/home_controller.dart';
@@ -25,6 +24,7 @@ class _HomePageStlessState extends State<HomePageStless> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => SafeArea(
+          ///ekranda kelime bittiginde kelime olmadıgını goster kosul ifadesi kullan
           child: controller.isBusy.value
               ? const CircularProgressIndicator()
               : (controller.learn.value == true)
@@ -35,7 +35,8 @@ class _HomePageStlessState extends State<HomePageStless> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
-                              height: MediaQuery.of(context).size.height * 0.732,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.732,
                               width: MediaQuery.of(context).size.width * 0.872,
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
@@ -99,11 +100,47 @@ class _HomePageStlessState extends State<HomePageStless> {
                                     child: CardSwiper(
                                       backCardOffset: const Offset(0, 27.0),
                                       padding: EdgeInsets.zero,
-                                      numberOfCardsDisplayed: 3,
+                                      numberOfCardsDisplayed: controller
+                                                  .wordsToLearn.length <
+                                              3
+                                          ? controller.wordsToLearn.length : 3,
                                       isLoop: true,
-                                      onEnd: () {},
                                       onSwipe: (previousIndex, currentIndex,
                                           direction) {
+                                        if (direction ==
+                                            CardSwiperDirection.right) {
+                                          if(controller.flipCardController.state?.isFront==false){
+                                            controller.flipCardController.toggleCard();
+                                            controller.changeBack(index);
+                                            controller.addknownWord(
+                                                controller.wordsToLearn[index]);
+                                            controller.learn_box.delete(
+                                                controller.wordsToLearn[index]);
+                                          }else
+                                          {
+                                            controller.addknownWord(
+                                                controller.wordsToLearn[index]);
+                                            controller.learn_box.delete(
+                                                controller.wordsToLearn[index]);
+                                          }
+                                        } else if (direction ==
+                                            CardSwiperDirection.left) {
+                                          if(controller.flipCardController.state?.isFront==false){
+                                            controller.flipCardController.toggleCard();
+                                            controller.changeBack(index);
+                                            controller.addLearnWord(
+                                                controller
+                                                    .wordsToLearn[index]);
+                                            controller.learn_box.delete(
+                                                controller.wordsToLearn[index]);
+                                          }else
+                                          {
+                                            controller.addLearnWord(
+                                                controller.wordsToLearn[index]);
+                                            controller.learn_box.delete(
+                                                controller.wordsToLearn[index]);
+                                          }
+                                        }
                                         index = currentIndex ?? previousIndex;
                                         return Future.value(true);
                                       },
@@ -116,6 +153,20 @@ class _HomePageStlessState extends State<HomePageStless> {
                                           controller:
                                               controller.flipCardController,
                                           side: CardSide.FRONT,
+                                          onFlip: () async {
+                                            if (controller.flipCardController
+                                                    .state?.isFront ==
+                                                true) {
+                                              controller
+                                                  .translateLearnWords(index);
+                                            } else if (controller
+                                                    .flipCardController
+                                                    .state
+                                                    ?.isFront ==
+                                                false) {
+                                              controller.changeBackLearn(index);
+                                            }
+                                          },
                                           direction: FlipDirection.HORIZONTAL,
                                           back: Card(
                                             shape: RoundedRectangleBorder(
@@ -126,7 +177,9 @@ class _HomePageStlessState extends State<HomePageStless> {
                                             child: Container(
                                               alignment: Alignment.center,
                                               child: Text(
-                                                "BACK",
+                                                ///translate
+                                                controller.wordsToLearn[index],
+                                                textAlign: TextAlign.center,
                                                 style: UIStyle.h1,
                                               ),
                                             ),
@@ -140,13 +193,33 @@ class _HomePageStlessState extends State<HomePageStless> {
                                             child: Container(
                                               alignment: Alignment.center,
                                               child: Text(
-                                                controller.wordsToLearn[index],
+                                                controller.wordsToLearn
+                                                    .elementAt(index),
                                                 style: UIStyle.h1,
                                               ),
                                             ),
                                           ),
                                         );
                                       },
+                                      /*onEnd: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: new Text("Alert"),
+                                                content: new Text(" "),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('OK'),
+                                                    onPressed: () {
+                                                      Get.to(() => WordsToLearn());
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },*/
                                     ),
                                   ),
                                   Container(
@@ -167,8 +240,6 @@ class _HomePageStlessState extends State<HomePageStless> {
                                             controller.decrement();
                                             controller.cardSwiperController
                                                 .swipeLeft();
-                                            controller.addLearnWord(
-                                                controller.wordsToLearn[index]);
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: UIColors.grey50,
@@ -248,6 +319,8 @@ class _HomePageStlessState extends State<HomePageStless> {
                                                 .swipeRight();
                                             controller.addknownWord(
                                                 controller.wordsToLearn[index]);
+                                            controller.learn_box
+                                                .deleteAt(index);
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: UIColors.grey50,
@@ -343,75 +416,138 @@ class _HomePageStlessState extends State<HomePageStless> {
                                         0.872,
                                     height: MediaQuery.of(context).size.height *
                                         0.472,
-                                    child: CardSwiper(
-                                      backCardOffset: const Offset(0, 27.0),
-                                      padding: EdgeInsets.zero,
-                                      numberOfCardsDisplayed: 3,
-                                      isLoop: true,
-                                      onEnd: () {
-                                        controller.listNext();
-                                      },
-                                      onSwipe: (previousIndex, currentIndex,
-                                          direction) {
-                                        index = currentIndex ?? previousIndex;
-                                        return Future.value(true);
-                                      },
-                                      controller:
-                                          controller.cardSwiperController,
-                                      cardsCount: controller.list.length,
-                                      cardBuilder: (context, index) {
-                                        return FlipCard(
-                                          controller:
-                                              controller.flipCardController,
-                                          side: CardSide.FRONT,
-                                          onFlipDone: (value) async {
-                                            if (controller.flipCardController
-                                                    .state?.isFront ==
-                                                true) {
-                                              await controller
-                                                  .translateWords(index);
-                                            } else if (controller
-                                                    .flipCardController
-                                                    .state
-                                                    ?.isFront ==
-                                                false) {
-                                              controller.changeBack(index);
-                                            }
-                                          },
-                                          direction: FlipDirection.HORIZONTAL,
-                                          back: Card(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        20.0)),
-                                            color: UIColors.primary400,
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                controller.list[index],
+                                    child: controller.list.isNotEmpty
+                                        ? CardSwiper(
+                                            allowedSwipeDirection:
+                                                AllowedSwipeDirection.only(
+                                                    right: true,
+                                                    left: true,
+                                                    down: false,
+                                                    up: false),
+                                            backCardOffset:
+                                                const Offset(0, 27.0),
+                                            padding: EdgeInsets.zero,
+                                            numberOfCardsDisplayed:
+                                                controller.list.length < 3
+                                                    ? controller.list.length
+                                                    : 3,
+                                            isLoop: true,
+                                            onEnd: () {
+                                              controller.listNext();
+                                            },
+                                            onSwipe: (previousIndex,
+                                                currentIndex, direction) {
+                                              if (direction ==
+                                                  CardSwiperDirection.right) {
+                                                if(controller.flipCardController.state?.isFront==false){
+                                                  controller.flipCardController.toggleCard();
+                                                  controller.changeBack(index);
+                                                  controller.addknownWord(
+                                                      controller.list[index]);
+                                                  controller.word_box.delete(
+                                                      controller.list[index]);
+                                                }else
+                                                {
+                                                  controller.addknownWord(
+                                                      controller.list[index]);
+                                                  controller.word_box.delete(
+                                                      controller.list[index]);
+                                                }
+                                              } else if (direction ==
+                                                  CardSwiperDirection.left) {
+                                                if(controller.flipCardController.state?.isFront==false){
+                                                  controller.flipCardController.toggleCard();
+                                                  controller.changeBack(index);
+                                                  controller.addLearnWord(
+                                                      controller
+                                                          .list[index]);
+                                                  controller.word_box.delete(controller.list[index]);
+                                                }else
+                                                {
+                                                  controller.addLearnWord(
+                                                      controller.list[index]);
+                                                  controller.word_box.delete(
+                                                      controller.list[index]);
+                                                }
+                                              }
+                                              index =
+                                                  currentIndex ?? previousIndex;
+                                              return Future.value(true);
+                                            },
+                                            controller:
+                                                controller.cardSwiperController,
+                                            cardsCount: controller.list.length,
+                                            cardBuilder: (context, index) {
+                                              return FlipCard(
+                                                onFlip: () async {
+                                                  controller.isCardBusy.value = true;
+                                                  if (controller
+                                                          .flipCardController
+                                                          .state
+                                                          ?.isFront ==
+                                                      true) {
+                                                    await controller
+                                                        .translateWords(index);
 
-                                                ///TRANSLATE INDEX AYARI
-                                                style: UIStyle.h1,
-                                              ),
-                                            ),
+                                                  } else if (controller
+                                                          .flipCardController
+                                                          .state
+                                                          ?.isFront ==
+                                                      false) {
+                                                    controller
+                                                        .changeBack(index);
+                                                  }
+                                                },
+                                                onFlipDone: (isDone){
+                                                  controller.isCardBusy.value = false;
+                                                },
+                                                controller: controller
+                                                    .flipCardController,
+                                                side: CardSide.FRONT,
+                                                direction:
+                                                    FlipDirection.HORIZONTAL,
+                                                back: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0)),
+                                                  color: UIColors.primary400,
+                                                  child: Container(
+                                                    alignment: Alignment.center,
+                                                    child:
+                                                        controller.isCardBusy.value ? CircularProgressIndicator() :
+                                                    Text(
+                                                      controller.list[index],
+
+                                                      ///TRANSLATE INDEX AYARI
+                                                      style: UIStyle.h1,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ),
+                                                front: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0)),
+                                                  color: UIColors.primary400,
+                                                  child: Container(
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                      controller.list[index],
+                                                      style: UIStyle.h1,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : Container(
+                                            child: Text(
+                                                'There are no words to show.',
+                                                style: UIStyle.h1),
                                           ),
-                                          front: Card(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        20.0)),
-                                            color: UIColors.primary400,
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                controller.list[index],
-                                                style: UIStyle.h1,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
                                   ),
                                   Container(
                                     width: MediaQuery.of(context).size.width *
@@ -428,16 +564,25 @@ class _HomePageStlessState extends State<HomePageStless> {
                                         ElevatedButton(
                                           //sola kaydirma
                                           onPressed: () {
-                                            controller.cardSwiperController
-                                                .swipeLeft();
-                                            if (controller.learn_box
-                                                .containsKey(
-                                                    controller.list[index])) {
-                                            } else {
-                                              controller.addLearnWord(
-                                                  controller.list[index]);
+                                            if (controller.flipCardController
+                                                    .state!.isFront ==
+                                                false) {
+                                              controller.flipCardController
+                                                  .toggleCard();
+                                              controller.changeBack(index);
+                                              controller.wordsToLearn
+                                                  .add(controller.list[index]);
                                               controller.word_box.delete(
                                                   controller.list[index]);
+                                              controller.cardSwiperController
+                                                  .swipeLeft();
+                                            } else {
+                                              controller.wordsToLearn
+                                                  .add(controller.list[index]);
+                                              controller.word_box.delete(
+                                                  controller.list[index]);
+                                              controller.cardSwiperController
+                                                  .swipeLeft();
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -475,15 +620,8 @@ class _HomePageStlessState extends State<HomePageStless> {
                                         ElevatedButton(
                                           //ters-duz etme
                                           onPressed: () async {
-                                            controller.isBusy;
-                                            CircularProgressIndicator(
-                                              color: UIColors.white,
-                                            );
                                             controller.flipCardController
                                                 .toggleCard();
-
-                                            ///translate words
-                                            //await controller.translateWords(index);
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: UIColors.grey50,
@@ -520,10 +658,10 @@ class _HomePageStlessState extends State<HomePageStless> {
                                         ElevatedButton(
                                           //saga kaydirma
                                           onPressed: () {
+                                            controller.flipCardController.state
+                                                ?.isFront = true;
                                             controller.cardSwiperController
                                                 .swipeRight();
-                                            controller.addknownWord(
-                                                controller.list[index]);
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: UIColors.grey50,
@@ -569,6 +707,7 @@ class _HomePageStlessState extends State<HomePageStless> {
                     ),
         ));
   }
-  
+}
 
 ///kelimelerin turkce ingilizce degisimlerinde bekleme suresi
+///wordtolearn ekranda gozuktukten sonra diger sayfaya gidiste sayfa iste guncellemesini sagla

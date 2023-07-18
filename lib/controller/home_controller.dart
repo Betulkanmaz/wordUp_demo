@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:flip_card/flip_card_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -35,7 +33,6 @@ class HomeController extends GetxController {
       data.addAll(word_box.values.map((e) => e.toString()));
       data.removeWhere(
               (word) => learn_box.values.contains(word) || known_box.values.contains(word));
-
       list.addAll(data.take(takeCount));
       isBusy.value = false;
       //await translateWords();
@@ -103,10 +100,8 @@ class HomeController extends GetxController {
     }
   }
 
-  RxList<String> translatedWords = <String>[].obs;
-
   RxBool isBusy = true.obs;
-
+  RxBool isCardBusy = false.obs;
   int get counter => wordsToLearn.length;
 
   decrement(){
@@ -115,11 +110,12 @@ class HomeController extends GetxController {
   }
 
   Future<void> translateWords(index) async {
-      var value = await translate(list[index], 'tr');
-      lastWord.value = list[index];
-      list[index] = value;
-      refresh();
-      update(list);
+    var value = await translate(list[index], 'tr');
+    lastWord.value = list[index];
+    list[index] = value;
+    refresh();
+    update(list);
+    isCardBusy.value = false;
   }
 
   CardSwiperController cardSwiperController = CardSwiperController();
@@ -156,4 +152,19 @@ class HomeController extends GetxController {
       update(list);
   }
 
+  Future<void> translateLearnWords(index) async {
+    //isBusy.value=false;
+    var value = await translate(wordsToLearn[index], 'tr');
+    lastWord.value = wordsToLearn[index];
+    wordsToLearn[index] = value;
+    refresh();
+    update(wordsToLearn);
+    //isBusy.value=true;
+  }
+
+  void changeBackLearn(int index) {
+    wordsToLearn[index] = lastWord.value;
+    refresh();
+    update(wordsToLearn);
+  }
 }

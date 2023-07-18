@@ -27,8 +27,8 @@ class _WordsToLearnState extends State<WordsToLearn> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() =>
-       SafeArea(
+    return Obx(
+      () => SafeArea(
         child: Scaffold(
           body: Padding(
             padding: const EdgeInsets.only(top: 16.0, left: 24.0, right: 24.0),
@@ -64,13 +64,13 @@ class _WordsToLearnState extends State<WordsToLearn> {
                         IconButton(
                           iconSize: 48.0,
                           onPressed: () {
-                            if(controller.wordsToLearn.length ==0){
+                            if (controller.learn_box.isEmpty) {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: new Text("Alert"),
-                                    content: new Text(""),
+                                    title: const Text("Alert"),
+                                    content: Text(" "),
                                     actions: <Widget>[
                                       TextButton(
                                         child: const Text('OK'),
@@ -82,8 +82,7 @@ class _WordsToLearnState extends State<WordsToLearn> {
                                   );
                                 },
                               );
-                            }else
-                            {
+                            } else {
                               controller.learn.value = true;
                               controller.wordsToLearn.clear();
                               controller.wordsToLearn.addAll(controller
@@ -106,7 +105,7 @@ class _WordsToLearnState extends State<WordsToLearn> {
                         children: [
                           ListView.separated(
                             separatorBuilder: (context, index) =>
-                            const SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
                             itemCount: controller.wordsToLearn.length,
@@ -114,26 +113,33 @@ class _WordsToLearnState extends State<WordsToLearn> {
                             itemBuilder: (BuildContext context, int index) {
                               return Container(
                                 padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                    bottom: 8.0,
-                                    left: 16.0,
-                                    right: 16.0),
-                                height:
-                                MediaQuery.of(context).size.height * 0.075,
+                                  top: 8.0,
+                                  bottom: 8.0,
+                                  left: 16.0,
+                                  right: 16.0,
+                                ),
+                                height: MediaQuery.of(context).size.height * 0.075,
+                                width: MediaQuery.of(context).size.width * 0.872,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16.0),
-                                  color: UIColors.grey50,
+                                  color: UIColors.grey100,
                                 ),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(controller.wordsToLearn.elementAt(index),
+                                    Text(
+                                      controller.wordsToLearn[index],
                                       style: UIStyle.b1.copyWith(
                                         color: UIColors.grey400,
                                       ),
                                     ),
+                                    /*Text(
+                                        controller.wordsToLearn[index],
+                                      style: UIStyle.b2_medium.copyWith(
+                                        color: UIColors.grey200,
+                                      ),
+                                    ),*/
                                   ],
                                 ),
                               );
