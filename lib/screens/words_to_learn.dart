@@ -7,6 +7,7 @@ import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
 import '../controller/home_controller.dart';
 import '../helper/strings.dart';
+import '../helper/word_model.dart';
 
 class WordsToLearn extends StatefulWidget {
   const WordsToLearn({Key? key}) : super(key: key);
@@ -87,7 +88,7 @@ class _WordsToLearnState extends State<WordsToLearn> {
                               controller.wordsToLearn.clear();
                               controller.wordsToLearn.addAll(controller
                                   .learn_box.values
-                                  .map((e) => e.toString()));
+                                  .map((e) => e is WordModel ? e : null));
                               controller.currentIndex.value = 1;
                             }
                           },
@@ -113,8 +114,8 @@ class _WordsToLearnState extends State<WordsToLearn> {
                             itemBuilder: (BuildContext context, int index) {
                               return Container(
                                 padding: const EdgeInsets.only(
-                                  top: 8.0,
-                                  bottom: 8.0,
+                                  top: 6.0,
+                                  bottom: 6.0,
                                   left: 16.0,
                                   right: 16.0,
                                 ),
@@ -129,17 +130,17 @@ class _WordsToLearnState extends State<WordsToLearn> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      controller.wordsToLearn[index],
+                                      controller.wordsToLearn[index]?.english ?? "",
                                       style: UIStyle.b1.copyWith(
                                         color: UIColors.grey400,
                                       ),
                                     ),
-                                    /*Text(
-                                        controller.wordsToLearn[index],
+                                    Text(
+                                        controller.wordsToLearn[index]?.turkish ?? "",
                                       style: UIStyle.b2_medium.copyWith(
                                         color: UIColors.grey200,
                                       ),
-                                    ),*/
+                                    ),
                                   ],
                                 ),
                               );

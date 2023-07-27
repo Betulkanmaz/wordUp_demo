@@ -1,17 +1,17 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wordup_demo/helper/bottom_navigaton_bar.dart';
 import 'package:wordup_demo/theme/colors.dart';
 import 'package:wordup_demo/theme/typhograpy.dart';
-
 import 'controller/home_controller.dart';
+import 'helper/word_model.dart';
 import 'helper/strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  Hive.registerAdapter(WordModelAdapter());
   await Hive.openBox('learn_words');
   await Hive.openBox('known_words');
   await Hive.openBox('word_box');

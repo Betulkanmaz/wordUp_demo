@@ -6,8 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import '../theme/colors.dart';
+import '../helper/word_model.dart';
 
 class HomeController extends GetxController {
   @override
@@ -31,25 +30,26 @@ class HomeController extends GetxController {
     }
     if (word_box.isNotEmpty) {
       data.addAll(word_box.values.map((e) => e.toString()));
-      data.removeWhere(
-              (word) => learn_box.values.contains(word) || known_box.values.contains(word));
+      data.removeWhere((word) =>
+          learn_box.values.contains(word) || known_box.values.contains(word));
       list.addAll(data.take(takeCount));
       isBusy.value = false;
-      //await translateWords();
     }
   }
 
-  RxList<String> wordsToLearn = <String>[].obs;
-  RxList<String> knownWords = <String>[].obs;
+  RxList<WordModel?> wordsToLearn = <WordModel?>[].obs;
+  RxList<WordModel?> knownWords = <WordModel?>[].obs;
+
+  RxBool isWordEnding = false.obs;
 
   setWordsToLearn() {
     wordsToLearn.clear();
-    wordsToLearn.addAll(learn_box.values.map((e) => e.toString()));
+    wordsToLearn.addAll(learn_box.values.map((e) => e is WordModel ? e : null));
   }
 
   setKnownWords() {
     knownWords.clear();
-    knownWords.addAll(known_box.values.map((e) => e.toString()));
+    knownWords.addAll(known_box.values.map((e) => e is WordModel ? e : null));
   }
 
   final RxBool learn = false.obs;
@@ -78,7 +78,8 @@ class HomeController extends GetxController {
   }
 
   Future<String> translate(String message, String toLanguageCode) async {
-    final url = Uri.parse('https://translation.googleapis.com/language/translate/v2');
+    final url =
+        Uri.parse('https://translation.googleapis.com/language/translate/v2');
     final response = await http.post(
       url,
       body: {
@@ -102,15 +103,18 @@ class HomeController extends GetxController {
 
   RxBool isBusy = true.obs;
   RxBool isCardBusy = false.obs;
+
   int get counter => wordsToLearn.length;
 
-  decrement(){
+  var languageCode = 'tr';
+
+  decrement() {
     wordsToLearn.refresh();
     wordsToLearn.length--;
   }
 
   Future<void> translateWords(index) async {
-    var value = await translate(list[index], 'tr');
+    var value = await translate(list[index], languageCode);
     lastWord.value = list[index];
     list[index] = value;
     refresh();
@@ -134,37 +138,59 @@ class HomeController extends GetxController {
     isBusy.value = false;
   }
 
-  addLearnWord(String word) {
-    if (!learn_box.values.contains(word)) {
-      learn_box.add(word);
+  addLearnWord(String word) async {
+    var translatedWord = await translate(word, languageCode);
+    var wordOnBox = WordModel(word, translatedWord);
+    if (!learn_box.values.any(
+        (element) => element is WordModel ? element.english == word : false)) {
+      learn_box.add(wordOnBox);
+      await word_box.deleteAt(word_box.values
+          .toList()
+          .indexOf(word_box.values.firstWhere((element) => element == word)));
+      if (word ==
+          known_box.values
+              .toList()
+              .indexOf(known_box.values.where((element) => element == word))) {
+        known_box.delete(word);
+      }
     }
   }
 
-  addknownWord(String word) {
-    if (!known_box.values.contains(word)) {
-      known_box.add(word);
+  addknownWord(String word) async {
+    var translatedWord = await translate(word, languageCode);
+    var wordOnBox = WordModel(word, translatedWord);
+    if (!known_box.values.any(
+        (element) => element is WordModel ? element.english == word : false)) {
+      known_box.add(wordOnBox);
+      await word_box.delete(word_box.values.toList().indexOf(word_box.values
+          .where((element) =>
+              element ==
+              word))); //listeye cevirdikten sonra element ilk gorulen yerde bulup sil
+      if (word ==
+          learn_box.values
+              .toList()
+              .indexOf(learn_box.values.where((element) => element == word))) {
+        known_box.delete(word);
+      }
+    }
+  }
+
+  addSecondList(String word) async {
+    var translatedWord = await translate(word, languageCode);
+    var wordOnBox = WordModel(word, translatedWord);
+    if (!known_box.values.any(
+        (element) => element is WordModel ? element.english == word : false)) {
+      known_box.add(wordOnBox);
+      await learn_box.delete(learn_box.values.toList().indexOf(learn_box.values
+          .where((element) =>
+              element ==
+              word))); //listeye cevirdikten sonra element ilk gorulen yerde bulup sil
     }
   }
 
   void changeBack(int index) {
-      list[index] = lastWord.value;
-      refresh();
-      update(list);
-  }
-
-  Future<void> translateLearnWords(index) async {
-    //isBusy.value=false;
-    var value = await translate(wordsToLearn[index], 'tr');
-    lastWord.value = wordsToLearn[index];
-    wordsToLearn[index] = value;
+    list[index] = lastWord.value;
     refresh();
-    update(wordsToLearn);
-    //isBusy.value=true;
-  }
-
-  void changeBackLearn(int index) {
-    wordsToLearn[index] = lastWord.value;
-    refresh();
-    update(wordsToLearn);
+    update(list);
   }
 }

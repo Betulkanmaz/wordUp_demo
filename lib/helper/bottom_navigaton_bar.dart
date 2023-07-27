@@ -1,10 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:wordup_demo/helper/strings.dart';
+import 'package:wordup_demo/helper/word_model.dart';
 import 'package:wordup_demo/screens/home_page.dart';
 import 'package:wordup_demo/screens/known_words.dart';
 import 'package:wordup_demo/screens/words_to_learn.dart';
@@ -48,7 +47,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
           controller.currentIndex.value = x;
           if(controller.currentIndex.value == 0){ //bottom deger degistiginde ekran yenileme oge ekleme
             controller.wordsToLearn.clear();
-            controller.wordsToLearn.addAll(controller.learn_box.values.map((e) => e.toString()));
+            controller.wordsToLearn.addAll(controller.learn_box.values.map((e) => e is WordModel ? e : null));
+            print(controller.wordsToLearn);
           }
           else if(controller.currentIndex.value == 1){
             controller.learn.value = false;
@@ -56,7 +56,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           }
           else if(controller.currentIndex.value == 2){
             controller.knownWords.clear();
-            controller.knownWords.addAll(controller.known_box.values.map((e) => e.toString()));
+            controller.knownWords.addAll(controller.known_box.values.map((e) => e is WordModel ? e : null));
           }
         },
         items: [

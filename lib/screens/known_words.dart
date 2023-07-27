@@ -64,26 +64,34 @@ class _KnownWordsState extends State<KnownWords> {
                             physics: ScrollPhysics(),
                             itemBuilder: (BuildContext context, int index) {
                               return Container(
-                                padding: EdgeInsets.only(
-                                    top: 8.0,
-                                    bottom: 8.0,
-                                    left: 16.0,
-                                    right: 16.0),
-                                height:
-                                    MediaQuery.of(context).size.height * 0.075,
+                                padding: const EdgeInsets.only(
+                                  top: 6.0,
+                                  bottom: 6.0,
+                                  left: 16.0,
+                                  right: 16.0,
+                                ),
+                                height: MediaQuery.of(context).size.height * 0.075,
+                                width: MediaQuery.of(context).size.width * 0.872,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16.0),
-                                  color: UIColors.grey50,
+                                  color: UIColors.grey100,
                                 ),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(controller.knownWords.elementAt(index),
-                                        style: UIStyle.b1.copyWith(
-                                          color: UIColors.grey400,
-                                        )),
+                                    Text(
+                                      controller.knownWords[index]?.english ?? "",
+                                      style: UIStyle.b1.copyWith(
+                                        color: UIColors.grey400,
+                                      ),
+                                    ),
+                                    Text(
+                                      controller.knownWords[index]?.turkish ?? "",
+                                      style: UIStyle.b2_medium.copyWith(
+                                        color: UIColors.grey200,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               );
